@@ -1,0 +1,4 @@
+import {anotherHello} from './another'
+
+print('Hello, world!')
+print(anotherHello)

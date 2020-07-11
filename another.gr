@@ -1,0 +1,1 @@
+export let anotherHello = "Hello from another file!"
