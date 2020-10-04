@@ -28,21 +28,6 @@ export function byteLength(s: u32): u32 {
   return size << 1
 }
 
-export function concat(s1: u32, s2: u32): u32 {
-  s1 = s1 ^ GRAIN_GENERIC_HEAP_TAG_TYPE
-  s2 = s2 ^ GRAIN_GENERIC_HEAP_TAG_TYPE
-
-  const size1 = stringSize(s1)
-  const size2 = stringSize(s2)
-
-  const newString = allocateString(size1 + size2)
-
-  memory.copy(newString + 8, s1 + 8, size1)
-  memory.copy(newString + 8 + size1, s2 + 8, size2)
-
-  return newString ^ GRAIN_GENERIC_HEAP_TAG_TYPE
-}
-
 export function slice(s: u32, from: i32, to: i32): u32 {
   const len = i32(length(s) >> 1)
 
@@ -97,7 +82,7 @@ export function contains(s: u32, p: u32): u32 {
   // searching phase in O(nm) time complexity
   // slightly (by coefficient) sub-linear in the average case
   // http://igm.univ-mlv.fr/~lecroq/string/node13.html#SECTION00130
-  
+
   s = s ^ GRAIN_GENERIC_HEAP_TAG_TYPE
   p = p ^ GRAIN_GENERIC_HEAP_TAG_TYPE
 
@@ -106,7 +91,7 @@ export function contains(s: u32, p: u32): u32 {
 
   s += 8
   p += 8
-  
+
   let j: u32 = 0, k: u32, ell: u32
 
   // Bail if pattern length is longer than input length
@@ -121,7 +106,7 @@ export function contains(s: u32, p: u32): u32 {
     } else j++
     return GRAIN_FALSE
   }
-  
+
   // NSM preprocessing
   if (load<u8>(p) === load<u8>(p, 1)) {
     k = 2
@@ -154,13 +139,13 @@ export function startsWith(s: u32, p: u32): u32 {
 
   s += 8
   p += 8
-  
+
   // Bail if pattern length is longer than input length
   if (m > n) return GRAIN_FALSE
 
-  if (memory.compare(p, s, m) === 0) {
-    return GRAIN_TRUE
-  } else return GRAIN_FALSE
+  return memory.compare(p, s, m) === 0
+    ? GRAIN_TRUE
+    : GRAIN_FALSE
 }
 
 export function endsWith(s: u32, p: u32): u32 {
@@ -172,11 +157,11 @@ export function endsWith(s: u32, p: u32): u32 {
 
   s += 8
   p += 8
-  
+
   // Bail if pattern length is longer than input length
   if (m > n) return GRAIN_FALSE
 
-  if (memory.compare(p, s + n - m, m) === 0) {
-    return GRAIN_TRUE
-  } else return GRAIN_FALSE
+  return memory.compare(p, s + n - m, m) === 0
+    ? GRAIN_TRUE
+    : GRAIN_FALSE
 }

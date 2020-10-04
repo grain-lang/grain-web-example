@@ -1,0 +1,7 @@
+{
+  "options": {
+    "-O3": true,
+    "runtime": "none",
+    "importMemory": true
+  }
+}

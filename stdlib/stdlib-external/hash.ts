@@ -3,28 +3,42 @@
   https://en.wikipedia.org/wiki/MurmurHash
 */
 
-import { 
+import {
   GRAIN_NUMBER_TAG_TYPE,
   GRAIN_CONST_TAG_TYPE,
   GRAIN_TUPLE_TAG_TYPE,
-  GRAIN_LAMBDA_TAG_TYPE, 
+  GRAIN_LAMBDA_TAG_TYPE,
   GRAIN_GENERIC_HEAP_TAG_TYPE,
 
-  GRAIN_NUMBER_TAG_MASK, 
+  GRAIN_NUMBER_TAG_MASK,
   GRAIN_GENERIC_TAG_MASK,
 
-  GRAIN_STRING_HEAP_TAG, 
+  GRAIN_STRING_HEAP_TAG,
   GRAIN_DOM_ELEM_TAG,
   GRAIN_ADT_HEAP_TAG,
-  GRAIN_RECORD_HEAP_TAG, 
+  GRAIN_RECORD_HEAP_TAG,
   GRAIN_ARRAY_HEAP_TAG,
-} from './ascutils/tags.ts'
+  GRAIN_BOXED_NUM_HEAP_TAG,
+  GRAIN_INT32_BOXED_NUM_TAG,
+  GRAIN_INT64_BOXED_NUM_TAG,
+  GRAIN_FLOAT32_BOXED_NUM_TAG,
+  GRAIN_FLOAT64_BOXED_NUM_TAG,
+  GRAIN_RATIONAL_BOXED_NUM_TAG,
+} from './ascutils/tags'
 
 import {
   GRAIN_TRUE,
   GRAIN_FALSE,
   GRAIN_VOID,
-} from './ascutils/primitives.ts'
+} from './ascutils/primitives'
+
+import {
+  boxedNumberTag,
+  boxedRationalNumerator,
+  boxedRationalDenominator,
+  boxedInt32Number,
+  boxedFloat32Number
+} from './numbers'
 
 const seed: u32 = 0xe444
 
@@ -70,7 +84,7 @@ function finalize(len: u32): void {
 
 function hashOne(val: u32, depth: u32): void {
   if (depth > MAX_HASH_DEPTH) return
-  
+
   if (!(val & GRAIN_NUMBER_TAG_MASK)) {
     hash32(val)
   } else if ((val & GRAIN_GENERIC_TAG_MASK) === GRAIN_TUPLE_TAG_TYPE) {
@@ -115,7 +129,7 @@ function hashOne(val: u32, depth: u32): void {
         hash32(load<u32>(heapPtr, 12))
 
         let arity = load<u32>(heapPtr, 16)
-        
+
         let a = arity * 4
         for (let i: u32 = 0; i < a; i += 4) {
           hashOne(load<u32>(heapPtr + i, 5 * 4), depth + 1)
@@ -131,7 +145,7 @@ function hashOne(val: u32, depth: u32): void {
         hash32(load<u32>(heapPtr, 8))
 
         let arity = load<u32>(heapPtr, 12)
-        
+
         let a = arity * 4
         for (let i: u32 = 0; i < a; i += 4) {
           hashOne(load<u32>(heapPtr + i, 4 * 4), depth + 1)
@@ -141,12 +155,45 @@ function hashOne(val: u32, depth: u32): void {
       }
       case GRAIN_ARRAY_HEAP_TAG: {
         let arity = load<u32>(heapPtr, 4)
-        
+
         let a = arity * 4
         for (let i: u32 = 0; i < a; i += 4) {
           hashOne(load<u32>(heapPtr + i, 2 * 4), depth + 1)
         }
         finalize(arity)
+        break
+      }
+      case GRAIN_BOXED_NUM_HEAP_TAG: {
+        let tag = boxedNumberTag(heapPtr)
+        switch (tag) {
+          case GRAIN_INT32_BOXED_NUM_TAG: {
+            hash32(boxedInt32Number(heapPtr))
+            break
+          }
+          case GRAIN_INT64_BOXED_NUM_TAG: {
+            hash32(load<u32>(heapPtr, 2 * 4))
+            hash32(load<u32>(heapPtr, 3 * 4))
+            break
+          }
+          case GRAIN_FLOAT32_BOXED_NUM_TAG: {
+            hash32(reinterpret<u32>(boxedFloat32Number(heapPtr)))
+            break
+          }
+          case GRAIN_FLOAT64_BOXED_NUM_TAG: {
+            hash32(load<u32>(heapPtr, 2 * 4))
+            hash32(load<u32>(heapPtr, 3 * 4))
+            break
+          }
+          case GRAIN_RATIONAL_BOXED_NUM_TAG: {
+            hash32(boxedRationalNumerator(heapPtr))
+            hash32(boxedRationalDenominator(heapPtr))
+            break
+          }
+          default: {
+            hash32(heapPtr)
+            break
+          }
+        }
         break
       }
       default: {
@@ -169,7 +216,7 @@ export function hash(a: u32): u32 {
 
   hashOne(a, 0)
   finalize(0)
-  
+
   // Tag the number on the way out.
   // Since Grain has proper modulus, negative numbers are okay.
   return h << 1

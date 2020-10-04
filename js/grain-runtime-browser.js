@@ -29234,7 +29234,7 @@ function defaultURLLocator(bases = []) {
   return async raw => {
     let module = raw.replace(/^GRAIN\$MODULE\$/, '');
     for (const base of bases) {
-      let fullpath = base + "/" + module + ".wasm";
+      let fullpath = base + "/" + module + ".gr.wasm";
       try {
         return await Object(_core_grain_module__WEBPACK_IMPORTED_MODULE_0__["readURL"])(fullpath);
       } catch (e) {
@@ -29252,7 +29252,7 @@ function defaultFileLocator(bases = []) {
   return async raw => {
     let module = raw.replace(/^GRAIN\$MODULE\$/, '');
     for (const base of bases) {
-      let fullpath = base + "/" + module + ".wasm";
+      let fullpath = base + "/" + module + ".gr.wasm";
       if (!fs.existsSync(fullpath)) {
         continue;
       }
