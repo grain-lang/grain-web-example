@@ -18,6 +18,12 @@ Run a webserver in this directory. If you have Python 3 on your computer, you ca
 python -m http.server
 ```
 
+If you have Python 2 on your computer, you can run
+
+```sh
+python server.py
+```
+
 If you visit `localhost:8000` and open your dev console, you should see the hello world messages appear.
 
 ## `index.html` Breakdown
@@ -30,4 +36,4 @@ We first load the Grain browser runtime with this script tag:
 
 `Grain.buildGrainRunner` takes a locator function as its argument. In this case, we just use the `defaultURLLocator`. As arguments, we pass the locations to look for wasm files—the current URL as the root, and the `stdlib` subdirectory. The default locator will try to find wasm files by first looking in the root of this project, followed by the stdlib directory.
 
-Once the `GrainRunner` is set up, we call `GrainRunner.runURL` with `hello.wasm`. The locator will then fetch `hello.wasm`, see that it depends on `another.wasm` and `pervasives.wasm`, and load those as well.
+Once the `GrainRunner` is set up, we call `GrainRunner.runURL` with `hello.gr.wasm`. The locator will then fetch `hello.gr.wasm`, see that it depends on `another.gr.wasm` and `pervasives.gr.wasm`, and load those as well.
