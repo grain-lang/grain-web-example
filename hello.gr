@@ -1,4 +1,4 @@
-import {anotherHello} from './another'
+import { anotherHello } from "./another"
 
-print('Hello, world!')
+print("Hello, world!")
 print(anotherHello)
