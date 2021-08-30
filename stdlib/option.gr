@@ -1,122 +1,150 @@
-# Standard library for Option functionality
+// Standard library for option functionality
 
 export *
 
-let isSome = (opt) => {
-  match (opt) {
-    | Some(_) => true
-    | None => false
+let isSome = (option) => {
+  match (option) {
+    Some(_) => true,
+    None => false
   }
 }
 
-let isNone = (opt) => {
-  match (opt) {
-    | None => true
-    | Some(_) => false
+let isNone = (option) => {
+  match (option) {
+    None => true,
+    Some(_) => false
   }
 }
 
-let contains = (val, opt) => {
-  match (opt) {
-    | Some(x) => x == val
-    | None => false
+let contains = (val, option) => {
+  match (option) {
+    Some(x) => x == val,
+    None => false
   }
 }
 
-let expect = (msg, opt) => {
-  match (opt) {
-    | Some(x) => x
-    | None => fail msg
+let expect = (msg, option) => {
+  match (option) {
+    Some(x) => x,
+    None => fail msg
   }
 }
 
-let unwrap = (opt) => {
-  expect('Could not unwrap None value', opt)
+let unwrap = (option) => {
+  expect("Could not unwrap None value", option)
 }
 
-let unwrapWithDefault = (default, opt) => {
-  match (opt) {
-    | Some(x) => x
-    | None => default
+let unwrapWithDefault = (default, option) => {
+  match (option) {
+    Some(x) => x,
+    None => default
   }
 }
 
-let map = (fn, opt) => {
-  match (opt) {
-    | Some(x) => Some(fn(x))
-    | None => None
+let map = (fn, option) => {
+  match (option) {
+    Some(x) => Some(fn(x)),
+    None => None
   }
 }
 
-let mapWithDefault = (default, fn, opt) => {
-  match (opt) {
-    | Some(x) => fn(x)
-    | None => default
+let mapWithDefault = (fn, default, option) => {
+  match (option) {
+    Some(x) => fn(x),
+    None => default
   }
 }
 
-let flatMap = (fn, opt) => {
-  match (opt) {
-    | Some(x) => fn(x)
-    | None => None
+let mapWithDefaultFn = (fn, defaultFn, option) => {
+  match (option) {
+    Some(x) => fn(x),
+    None => defaultFn()
   }
 }
 
-let filter = (pred, opt) => {
-  match (opt) {
-    | Some(x) =>
+let flatMap = (fn, option) => {
+  match (option) {
+    Some(x) => fn(x),
+    None => None
+  }
+}
+
+let filter = (pred, option) => {
+  match (option) {
+    Some(x) =>
       if (pred(x)) {
         Some(x)
       } else {
         None
-      }
-    | None => None
+      },
+    None => None
   }
 }
 
-let zip = (optA, optB) => {
-  match ((optA, optB)) {
-    | (Some(a), Some(b)) => Some((a, b))
-    | _ => None
+let zip = (optionA, optionB) => {
+  match ((optionA, optionB)) {
+    (Some(a), Some(b)) => Some((a, b)),
+    _ => None
   }
 }
 
-let zipWith = (fn, optA, optB) => {
-  match ((optA, optB)) {
-    | (Some(a), Some(b)) => Some(fn(a, b))
-    | _ => None
+let zipWith = (fn, optionA, optionB) => {
+  match ((optionA, optionB)) {
+    (Some(a), Some(b)) => Some(fn(a, b)),
+    _ => None
   }
 }
 
-let flatten = (opt) => {
-  match (opt) {
-    | Some(Some(x)) => Some(x)
-    | _ => None
+let flatten = (option) => {
+  match (option) {
+    Some(Some(x)) => Some(x),
+    _ => None
   }
 }
 
-let toList = (opt) => {
-  match (opt) {
-    | Some(x) => [x]
-    | None => []
+let toList = (option) => {
+  match (option) {
+    Some(x) => [x],
+    None => []
   }
 }
 
-let toArray = (opt) => {
-  match (opt) {
-    | Some(x) => [> x]
-    | None => [>]
+let toArray = (option) => {
+  match (option) {
+    Some(x) => [> x],
+    None => [>]
   }
 }
 
-let sideEffect = (fn, opt) => {
-  match (opt) {
-    | Some(x) => fn(x)
-    | None => void
+let sideEffect = (fn, option) => {
+  match (option) {
+    Some(x) => fn(x),
+    None => void
   }
 }
 
-let peek = (fn, opt) => {
-  sideEffect(fn, opt)
-  opt
+let peek = (fn, option) => {
+  sideEffect(fn, option)
+  option
+}
+
+let or = (r1, r2) => {
+  match (r1) {
+    Some(x) => r1,
+    None => r2
+  }
+}
+
+let and = (r1, r2) => {
+  match (r1) {
+    Some(_) => r2,
+    None => r1
+  }
+}
+
+let toResult = (err, option) => {
+  match (option) {
+    Some(a) => Ok(a),
+    None    => Err(err)
+  }
 }

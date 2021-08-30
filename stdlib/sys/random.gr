@@ -1,5 +1,25 @@
-export *
+/* grainc-flags --no-gc */
 
-# Produce a random number. This function can be slow, so it's best to seed a generator if lots of random data is needed
-# @returns Number
-import foreign wasm random : () -> Number from 'stdlib-external/sys'
+import WasmI32, {
+  eq as (==),
+  ne as (!=)
+} from "runtime/unsafe/wasmi32"
+import Memory from "runtime/unsafe/memory"
+import Wasi from "runtime/wasi"
+import { tagSimpleNumber } from "runtime/dataStructures"
+
+// Produce a random number. This function can be slow, so it's best to seed a generator if lots of random data is needed
+// @returns Number
+export let random = () => {
+  let buf = Memory.malloc(4n)
+
+  let err = Wasi.random_get(buf, 4n)
+  if (err != Wasi._ESUCCESS) {
+    Memory.free(buf)
+    throw Wasi.SystemError(tagSimpleNumber(err))
+  }
+
+  let rand = WasmI32.load(buf, 0n)
+  Memory.free(buf)
+  tagSimpleNumber(rand)
+}

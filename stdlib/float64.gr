@@ -1,0 +1,94 @@
+import WasmI32 from "runtime/unsafe/wasmi32"
+import WasmF64 from "runtime/unsafe/wasmf64"
+import {
+  newFloat64
+} from "runtime/dataStructures"
+
+import {
+  coerceNumberToFloat64 as fromNumber,
+  coerceFloat64ToNumber as toNumber
+} from "runtime/numbers"
+
+export fromNumber
+export toNumber
+
+
+@disableGC
+export let add = (x: Float64, y: Float64) => {
+  let x = WasmF64.load(WasmI32.fromGrain(x), 8n)
+  let y = WasmF64.load(WasmI32.fromGrain(y), 8n)
+  let ptr = newFloat64(WasmF64.add(x, y))
+  WasmI32.toGrain(ptr) : Float64
+}
+
+@disableGC
+export let sub = (x: Float64, y: Float64) => {
+  let x = WasmF64.load(WasmI32.fromGrain(x), 8n)
+  let y = WasmF64.load(WasmI32.fromGrain(y), 8n)
+  let ptr = newFloat64(WasmF64.sub(x, y))
+  WasmI32.toGrain(ptr) : Float64
+}
+
+@disableGC
+export let mul = (x: Float64, y: Float64) => {
+  let x = WasmF64.load(WasmI32.fromGrain(x), 8n)
+  let y = WasmF64.load(WasmI32.fromGrain(y), 8n)
+  let ptr = newFloat64(WasmF64.mul(x, y))
+  WasmI32.toGrain(ptr) : Float64
+}
+
+@disableGC
+export let div = (x: Float64, y: Float64) => {
+  let x = WasmF64.load(WasmI32.fromGrain(x), 8n)
+  let y = WasmF64.load(WasmI32.fromGrain(y), 8n)
+  let ptr = newFloat64(WasmF64.div(x, y))
+  WasmI32.toGrain(ptr) : Float64
+}
+
+
+// Float64 comparisons
+@disableGC
+export let lt = (x: Float64, y: Float64) => {
+  let x = WasmF64.load(WasmI32.fromGrain(x), 8n)
+  let y = WasmF64.load(WasmI32.fromGrain(y), 8n)
+  WasmF64.lt(x, y)
+}
+
+@disableGC
+export let gt = (x: Float64, y: Float64) => {
+  let x = WasmF64.load(WasmI32.fromGrain(x), 8n)
+  let y = WasmF64.load(WasmI32.fromGrain(y), 8n)
+  WasmF64.gt(x, y)
+}
+
+@disableGC
+export let lte = (x: Float64, y: Float64) => {
+  let x = WasmF64.load(WasmI32.fromGrain(x), 8n)
+  let y = WasmF64.load(WasmI32.fromGrain(y), 8n)
+  WasmF64.le(x, y)
+}
+
+@disableGC
+export let gte = (x: Float64, y: Float64) => {
+  let x = WasmF64.load(WasmI32.fromGrain(x), 8n)
+  let y = WasmF64.load(WasmI32.fromGrain(y), 8n)
+  WasmF64.ge(x, y)
+}
+
+// floating-point constants:
+
+@disableGC
+let makeInfinity = () => {
+  let ptr = newFloat64(WasmF64.reinterpretI64(0b0111111111110000000000000000000000000000000000000000000000000000N))
+  WasmI32.toGrain(ptr) : Float64
+}
+
+export let infinity = makeInfinity()
+
+@disableGC
+let makeNaN = () => {
+  let ptr = newFloat64(WasmF64.reinterpretI64(0b0111111111110000000000000000000000000000000000000000000000000001N))
+  WasmI32.toGrain(ptr) : Float64
+}
+
+export let nan = makeNaN()
