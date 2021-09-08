@@ -4,7 +4,15 @@ This repo contains an example of Grain wasm files running in a browser.
 
 ## Setup
 
-You'll first need to compile the wasm files. The easiest way to do this is to use the built-in npm script:
+First, you'll need to install the Grain compiler by following the [Getting Grain](https://grain-lang.org/docs/getting_grain) guide for your operating system.
+
+Additionally, you'll need to install the project dependencies using:
+
+```sh
+npm install
+```
+
+The easiest way to compile your Grain files to WebAssembly is to use the built-in npm script:
 
 ```sh
 npm run compile
@@ -12,7 +20,7 @@ npm run compile
 
 This will compile `hello.gr`, `another.gr`, and the necessary stdlib dependencies.
 
-Run a webserver in this directory. You can run another npm script:
+Then, run a webserver in this directory. You can use our other npm script:
 
 ```sh
 npm start
